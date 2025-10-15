@@ -1,0 +1,22 @@
+{
+  "name": "test_meddra_db",
+  "version": "1.0.0",
+  "description": "**완전 정적 웹 애플리케이션** - GitHub Pages에서 실행되는 CIOMS-I 부작용 보고서 관리 시스템",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}
