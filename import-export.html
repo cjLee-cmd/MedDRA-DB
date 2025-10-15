@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가져오기/내보내기 | CIOMS-I System</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+
+    <style>
+        .import-export-section {
+            background-color: var(--bg-primary);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            text-align: center;
+            transition: all var(--transition-fast);
+            margin: var(--spacing-md) 0;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: var(--bg-hover);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: var(--bg-hover);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .stat-card {
+            background-color: var(--bg-secondary);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .preview-area {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: var(--font-size-sm);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">CIOMS-I Form Management</h1>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">폼 목록</a>
+                <a href="form-edit.html" class="nav-link">새 폼 작성</a>
+                <a href="test.html" class="nav-link">테스트</a>
+            </nav>
+            <div class="header-actions">
+                <span id="form-count" class="badge">0</span>
+                <span class="text-muted">개 폼</span>
+                <div id="theme-toggle-container"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>데이터 가져오기/내보내기</h1>
+                <p class="subtitle">CIOMS-I 폼 데이터를 JSON 형식으로 내보내거나 가져올 수 있습니다</p>
+            </div>
+
+            <!-- Current Database Stats -->
+            <section class="import-export-section">
+                <h2>현재 데이터베이스 상태</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-forms">0</div>
+                        <div class="stat-label">총 폼 수</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-patients">0</div>
+                        <div class="stat-label">환자 정보</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-reactions">0</div>
+                        <div class="stat-label">부작용 기록</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-drugs">0</div>
+                        <div class="stat-label">약물 정보</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Export Section -->
+            <section class="import-export-section">
+                <h2>데이터 내보내기 (Export)</h2>
+                <p>현재 데이터베이스의 모든 데이터를 JSON 파일로 내보냅니다.</p>
+
+                <div class="form-actions">
+                    <button onclick="exportAllData()" class="btn btn-primary">
+                        📥 전체 데이터 내보내기
+                    </button>
+                    <button onclick="exportFormsOnly()" class="btn btn-secondary">
+                        📄 폼만 내보내기
+                    </button>
+                </div>
+
+                <div id="export-result" class="preview-area" style="display: none;"></div>
+            </section>
+
+            <!-- Import Section -->
+            <section class="import-export-section">
+                <h2>데이터 가져오기 (Import)</h2>
+                <p>JSON 파일에서 데이터를 가져와 데이터베이스에 추가합니다.</p>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ 주의:</strong> 가져오기는 기존 데이터에 추가됩니다.
+                    기존 데이터를 먼저 삭제하려면 테스트 페이지에서 "모든 데이터 삭제"를 실행하세요.
+                </div>
+
+                <div class="file-upload-area" id="drop-zone">
+                    <div class="upload-icon">📁</div>
+                    <p>JSON 파일을 드래그 앤 드롭하거나 클릭하여 선택하세요</p>
+                    <input type="file" id="file-input" class="file-input" accept=".json" onchange="handleFileSelect(event)">
+                    <button onclick="document.getElementById('file-input').click()" class="btn btn-primary">
+                        파일 선택
+                    </button>
+                </div>
+
+                <div id="import-preview" class="preview-area" style="display: none;"></div>
+
+                <div id="import-actions" style="display: none; margin-top: var(--spacing-md);">
+                    <button onclick="confirmImport()" class="btn btn-primary">
+                        ✅ 가져오기 실행
+                    </button>
+                    <button onclick="cancelImport()" class="btn btn-secondary">
+                        취소
+                    </button>
+                </div>
+
+                <div id="import-result" style="display: none; margin-top: var(--spacing-md);"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 CIOMS-I Form Management System</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display: none;">
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>처리 중...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/pages/import-export.js"></script>
+    <script type="module">
+        import { createThemeToggle } from './js/utils/dark-mode.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('theme-toggle-container');
+            if (container) {
+                createThemeToggle(container);
+            }
+        });
+    </script>
+</body>
+</html>

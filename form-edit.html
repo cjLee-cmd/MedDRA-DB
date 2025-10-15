@@ -8,6 +8,7 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
 
     <style>
         .form-section {
@@ -158,6 +159,7 @@
             </nav>
             <div class="status-indicator">
                 <span id="db-status">IndexedDB: <span id="db-status-text">연결 중...</span></span>
+                <div id="theme-toggle-container"></div>
             </div>
         </div>
     </header>
@@ -333,3 +335,13 @@
     <!-- Scripts -->
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/pages/form-edit.js"></script>
+    <script type="module">
+        import { createThemeToggle } from './js/utils/dark-mode.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('theme-toggle-container');
+            if (container) {
+                createThemeToggle(container);
+            }
+        });
+    </script>

@@ -9,6 +9,7 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
@@ -24,6 +25,7 @@
             <div class="header-actions">
                 <span id="form-count" class="badge">0</span>
                 <span class="text-muted">개 폼</span>
+                <div id="theme-toggle-container"></div>
             </div>
         </div>
     </header>
@@ -218,5 +220,15 @@
     <!-- Scripts -->
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/pages/index.js"></script>
+    <script type="module">
+        import { createThemeToggle } from './js/utils/dark-mode.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('theme-toggle-container');
+            if (container) {
+                createThemeToggle(container);
+            }
+        });
+    </script>
 </body>
 </html>
