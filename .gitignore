@@ -67,10 +67,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Playwright Test Results
+playwright-report/
+test-results/
+.last-run.json
+
 # Temporary Files
 *.tmp
 *.temp
 .cache/
+.server.pid
 
 # macOS
 .DS_Store
