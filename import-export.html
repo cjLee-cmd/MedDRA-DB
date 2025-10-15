@@ -91,7 +91,7 @@
         <div class="container">
             <h1 class="logo">CIOMS-I Form Management</h1>
             <nav class="nav">
-                <a href="index.html" class="nav-link">폼 목록</a>
+                <a href="main.html" class="nav-link">폼 목록</a>
                 <a href="form-edit.html" class="nav-link">새 폼 작성</a>
                 <a href="test.html" class="nav-link">테스트</a>
             </nav>
@@ -203,6 +203,11 @@
     </div>
 
     <!-- Scripts -->
+    <script type="module">
+        import { requireAuth } from './js/auth.js';
+        // Check authentication before loading page
+        requireAuth();
+    </script>
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/pages/import-export.js"></script>
     <script type="module">
