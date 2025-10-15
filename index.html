@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CIOMS-I 부작용 보고서 관리 시스템">
+    <title>CIOMS-I Form Management System</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">CIOMS-I Form Management</h1>
+            <nav class="nav">
+                <a href="index.html" class="nav-link active">폼 목록</a>
+                <a href="form-edit.html" class="nav-link">새 폼 추가</a>
+                <a href="import-export.html" class="nav-link">가져오기/내보내기</a>
+            </nav>
+            <div class="header-actions">
+                <span id="form-count" class="badge">0</span>
+                <span class="text-muted">개 폼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Search and Filter Section -->
+            <section class="search-section">
+                <h2>검색 및 필터</h2>
+
+                <form id="search-form" class="search-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="search-control-no">제조사 관리 번호</label>
+                            <input
+                                type="text"
+                                id="search-control-no"
+                                class="form-control"
+                                placeholder="예: 40054">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="search-patient-initials">환자 이니셜</label>
+                            <input
+                                type="text"
+                                id="search-patient-initials"
+                                class="form-control"
+                                placeholder="예: INT">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="search-country">국가</label>
+                            <input
+                                type="text"
+                                id="search-country"
+                                class="form-control"
+                                placeholder="예: GERMANY">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="search-date-from">접수일 (시작)</label>
+                            <input
+                                type="date"
+                                id="search-date-from"
+                                class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="search-date-to">접수일 (종료)</label>
+                            <input
+                                type="date"
+                                id="search-date-to"
+                                class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="search-reaction">부작용 용어</label>
+                            <input
+                                type="text"
+                                id="search-reaction"
+                                class="form-control"
+                                placeholder="영어 또는 한글">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="search-drug">약물 이름</label>
+                            <input
+                                type="text"
+                                id="search-drug"
+                                class="form-control"
+                                placeholder="영어 또는 한글">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">검색</button>
+                        <button type="button" id="clear-search" class="btn btn-secondary">초기화</button>
+                        <button type="button" id="show-all" class="btn btn-secondary">전체 보기</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <div class="results-header">
+                    <h2>폼 목록</h2>
+                    <div class="results-actions">
+                        <select id="sort-by" class="form-control form-control-sm">
+                            <option value="date_received:desc">접수일 (최신순)</option>
+                            <option value="date_received:asc">접수일 (과거순)</option>
+                            <option value="manufacturer_control_no:asc">관리번호 (오름차순)</option>
+                            <option value="manufacturer_control_no:desc">관리번호 (내림차순)</option>
+                            <option value="created_at:desc">생성일 (최신순)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="error" class="alert alert-error" style="display: none;">
+                    <strong>오류:</strong> <span id="error-message"></span>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <svg class="empty-icon" viewBox="0 0 24 24" width="64" height="64">
+                        <path fill="currentColor" d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,5V19H5V5H19M17,17H7V15H17V17M17,13H7V11H17V13M17,9H7V7H17V9Z"/>
+                    </svg>
+                    <h3>폼이 없습니다</h3>
+                    <p>새 CIOMS-I 폼을 추가하거나 데이터를 가져오세요.</p>
+                    <div class="empty-actions">
+                        <a href="form-edit.html" class="btn btn-primary">새 폼 추가</a>
+                        <a href="import-export.html" class="btn btn-secondary">데이터 가져오기</a>
+                    </div>
+                </div>
+
+                <!-- Forms Table -->
+                <div id="forms-table-container" style="display: none;">
+                    <table id="forms-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>관리번호</th>
+                                <th>접수일</th>
+                                <th>환자</th>
+                                <th>국가</th>
+                                <th>부작용 수</th>
+                                <th>약물 수</th>
+                                <th>작업</th>
+                            </tr>
+                        </thead>
+                        <tbody id="forms-tbody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination -->
+                    <div id="pagination" class="pagination">
+                        <button id="prev-page" class="btn btn-sm btn-secondary" disabled>이전</button>
+                        <span id="page-info" class="page-info">페이지 1 / 1</span>
+                        <button id="next-page" class="btn btn-sm btn-secondary" disabled>다음</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 CIOMS-I Form Management System |
+                <a href="https://github.com" target="_blank">GitHub</a> |
+                <span id="db-status" class="db-status">IndexedDB: 연결 중...</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>폼 삭제 확인</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>정말로 이 폼을 삭제하시겠습니까?</p>
+                <p class="text-warning">
+                    <strong>경고:</strong> 이 작업은 되돌릴 수 없으며,
+                    환자 정보, 부작용, 약물 정보 등 모든 관련 데이터가 삭제됩니다.
+                </p>
+                <p><strong>관리번호:</strong> <span id="delete-form-control-no"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">취소</button>
+                <button id="confirm-delete" class="btn btn-danger">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display: none;">
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/pages/index.js"></script>
+</body>
+</html>

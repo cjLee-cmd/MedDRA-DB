@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIOMS-I System - Test Page</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <style>
+        .test-section {
+            background-color: var(--bg-primary);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .test-result {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-secondary);
+            font-family: monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .test-result.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .test-result.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .status-badge.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-badge.error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .status-badge.pending {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">CIOMS-I Test Console</h1>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">메인 페이지로</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="alert alert-warning">
+                <strong>테스트 페이지:</strong> 이 페이지는 개발 및 테스트용입니다.
+                IndexedDB 데이터베이스를 테스트하고 샘플 데이터를 생성할 수 있습니다.
+            </div>
+
+            <!-- Database Connection Test -->
+            <section class="test-section">
+                <h2>1. 데이터베이스 연결 테스트</h2>
+                <p>IndexedDB 연결 상태를 확인합니다.</p>
+
+                <div class="btn-group">
+                    <button onclick="testDatabaseConnection()" class="btn btn-primary">
+                        연결 테스트
+                    </button>
+                </div>
+
+                <div id="db-test-result" class="test-result" style="display: none;"></div>
+            </section>
+
+            <!-- Sample Data Generation -->
+            <section class="test-section">
+                <h2>2. 샘플 데이터 생성</h2>
+                <p>테스트용 CIOMS-I 폼을 생성합니다.</p>
+
+                <div class="btn-group">
+                    <button onclick="createSampleData(3)" class="btn btn-primary">
+                        샘플 폼 3개 생성
+                    </button>
+                    <button onclick="createSampleData(10)" class="btn btn-secondary">
+                        샘플 폼 10개 생성
+                    </button>
+                    <button onclick="createSampleData(50)" class="btn btn-secondary">
+                        샘플 폼 50개 생성
+                    </button>
+                </div>
+
+                <div id="sample-data-result" class="test-result" style="display: none;"></div>
+            </section>
+
+            <!-- Data Query Test -->
+            <section class="test-section">
+                <h2>3. 데이터 조회 테스트</h2>
+                <p>저장된 폼을 조회합니다.</p>
+
+                <div class="btn-group">
+                    <button onclick="testGetAllForms()" class="btn btn-primary">
+                        전체 폼 조회
+                    </button>
+                    <button onclick="testSearchForms()" class="btn btn-secondary">
+                        검색 테스트
+                    </button>
+                    <button onclick="testFormCount()" class="btn btn-secondary">
+                        폼 개수 확인
+                    </button>
+                </div>
+
+                <div id="query-test-result" class="test-result" style="display: none;"></div>
+            </section>
+
+            <!-- CRUD Operations Test -->
+            <section class="test-section">
+                <h2>4. CRUD 작업 테스트</h2>
+                <p>생성, 읽기, 수정, 삭제 기능을 테스트합니다.</p>
+
+                <div class="btn-group">
+                    <button onclick="testCreateForm()" class="btn btn-primary">
+                        폼 생성
+                    </button>
+                    <button onclick="testUpdateForm()" class="btn btn-secondary">
+                        폼 수정
+                    </button>
+                    <button onclick="testDeleteForm()" class="btn btn-secondary">
+                        폼 삭제
+                    </button>
+                </div>
+
+                <div id="crud-test-result" class="test-result" style="display: none;"></div>
+            </section>
+
+            <!-- Data Export/Import Test -->
+            <section class="test-section">
+                <h2>5. 데이터 내보내기/가져오기 테스트</h2>
+                <p>JSON 형식으로 데이터를 내보내고 가져옵니다.</p>
+
+                <div class="btn-group">
+                    <button onclick="testExportData()" class="btn btn-primary">
+                        데이터 내보내기
+                    </button>
+                    <button onclick="testImportData()" class="btn btn-secondary">
+                        데이터 가져오기 (샘플)
+                    </button>
+                </div>
+
+                <div id="export-test-result" class="test-result" style="display: none;"></div>
+            </section>
+
+            <!-- Clear All Data -->
+            <section class="test-section">
+                <h2>6. 데이터 초기화</h2>
+                <p class="text-warning">
+                    <strong>⚠️ 경고:</strong> 모든 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
+                </p>
+
+                <div class="btn-group">
+                    <button onclick="clearAllData()" class="btn btn-danger">
+                        모든 데이터 삭제
+                    </button>
+                </div>
+
+                <div id="clear-test-result" class="test-result" style="display: none;"></div>
+            </section>
+
+            <!-- Test Summary -->
+            <section class="test-section">
+                <h2>테스트 요약</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">데이터베이스 상태</span>
+                        <span class="info-value" id="summary-db-status">
+                            <span class="status-badge pending">대기 중</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">저장된 폼 수</span>
+                        <span class="info-value" id="summary-form-count">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">마지막 테스트</span>
+                        <span class="info-value" id="summary-last-test">없음</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 CIOMS-I Form Management System | Test Console</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display: none;">
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/test-console.js"></script>
+</body>
+</html>

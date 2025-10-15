@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIOMS-I 폼 입력 | CIOMS-I System</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <style>
+        .form-section {
+            background-color: var(--bg-primary);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-section h2 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+
+        .form-group label.required::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-base);
+            transition: border-color var(--transition-fast);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .repeatable-section {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            background-color: var(--bg-secondary);
+        }
+
+        .repeatable-item {
+            background-color: var(--bg-primary);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-md);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .repeatable-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .btn-remove {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+        }
+
+        .btn-remove:hover {
+            opacity: 0.9;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .bilingual-input {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+        }
+
+        .help-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-xs);
+            display: none;
+        }
+
+        .form-group.error input,
+        .form-group.error select,
+        .form-group.error textarea {
+            border-color: var(--danger-color);
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">CIOMS-I Form Management</h1>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">폼 목록</a>
+                <a href="form-edit.html" class="nav-link active">새 폼 작성</a>
+                <a href="test.html" class="nav-link">테스트</a>
+            </nav>
+            <div class="status-indicator">
+                <span id="db-status">IndexedDB: <span id="db-status-text">연결 중...</span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1 id="page-title">새 CIOMS-I 폼 작성</h1>
+                <p class="subtitle">부작용 보고서 정보를 입력하세요</p>
+            </div>
+
+            <form id="cioms-form">
+                <!-- Section 1: Report Information -->
+                <section class="form-section">
+                    <h2>1. 보고서 정보</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="manufacturer_control_no" class="required">관리번호</label>
+                            <input type="text" id="manufacturer_control_no" name="manufacturer_control_no"
+                                   required pattern="[A-Za-z0-9-_]+" maxlength="100">
+                            <span class="help-text">예: 40054-1</span>
+                            <span class="error-message">영문, 숫자, -, _ 만 사용 가능합니다</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="date_received" class="required">접수일</label>
+                            <input type="date" id="date_received" name="date_received" required>
+                            <span class="error-message">미래 날짜는 입력할 수 없습니다</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Patient Information -->
+                <section class="form-section">
+                    <h2>2. 환자 정보</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="patient_initials" class="required">환자 이니셜</label>
+                            <input type="text" id="patient_initials" name="patient_initials"
+                                   required pattern="[A-Za-z]+" maxlength="10">
+                            <span class="help-text">예: ABC</span>
+                            <span class="error-message">영문 대문자만 입력 가능합니다</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient_country" class="required">국가</label>
+                            <input type="text" id="patient_country" name="patient_country" required>
+                            <span class="help-text">예: KOREA, USA, GERMANY</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient_age" class="required">나이</label>
+                            <input type="text" id="patient_age" name="patient_age"
+                                   required pattern="\d+\s+(Years?|Months?|Days?|Hours?)">
+                            <span class="help-text">예: 62 Years, 6 Months</span>
+                            <span class="error-message">형식: 숫자 + 단위 (예: 62 Years)</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient_sex" class="required">성별</label>
+                            <select id="patient_sex" name="patient_sex" required>
+                                <option value="">선택하세요</option>
+                                <option value="M">남성 (M)</option>
+                                <option value="F">여성 (F)</option>
+                                <option value="Unknown">알 수 없음 (Unknown)</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Adverse Reactions -->
+                <section class="form-section">
+                    <h2>3. 부작용 (Adverse Reactions)</h2>
+                    <div class="repeatable-section">
+                        <div id="adverse-reactions-container"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addAdverseReaction()">
+                            + 부작용 추가
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 4: Suspected Drugs -->
+                <section class="form-section">
+                    <h2>4. 의심 약물 (Suspected Drugs)</h2>
+                    <div class="repeatable-section">
+                        <div id="suspected-drugs-container"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addSuspectedDrug()">
+                            + 약물 추가
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 5: Laboratory Results -->
+                <section class="form-section">
+                    <h2>5. 검사 결과 (Laboratory Results)</h2>
+                    <div class="repeatable-section">
+                        <div id="lab-results-container"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addLabResult()">
+                            + 검사 결과 추가
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 6: Causality Assessment -->
+                <section class="form-section">
+                    <h2>6. 인과관계 평가 (Causality Assessment)</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="causality_method">평가 방법</label>
+                            <select id="causality_method" name="causality_method">
+                                <option value="">선택하세요</option>
+                                <option value="WHO-UMC">WHO-UMC</option>
+                                <option value="Naranjo">Naranjo Algorithm</option>
+                                <option value="Karch-Lasagna">Karch-Lasagna</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="causality_category">평가 결과</label>
+                            <select id="causality_category" name="causality_category">
+                                <option value="">선택하세요</option>
+                                <option value="Certain">Certain (확실)</option>
+                                <option value="Probable">Probable (상당히 확실)</option>
+                                <option value="Possible">Possible (가능)</option>
+                                <option value="Unlikely">Unlikely (가능성 낮음)</option>
+                                <option value="Unclassified">Unclassified (분류 불가)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="causality_reason">평가 근거</label>
+                            <textarea id="causality_reason" name="causality_reason"
+                                      placeholder="인과관계 평가의 근거를 입력하세요"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="causality_assessed_by">평가자</label>
+                            <input type="text" id="causality_assessed_by" name="causality_assessed_by">
+                        </div>
+                        <div class="form-group">
+                            <label for="causality_assessed_date">평가일</label>
+                            <input type="date" id="causality_assessed_date" name="causality_assessed_date">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">
+                        취소
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="saveAsDraft()">
+                        임시 저장
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 CIOMS-I Form Management System</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display: none;">
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>처리 중...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/pages/form-edit.js"></script>
