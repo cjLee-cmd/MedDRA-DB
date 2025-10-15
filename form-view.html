@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>폼 상세보기 | CIOMS-I System</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+
+    <style>
+        .view-section {
+            background-color: var(--bg-primary);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .view-section h2 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .view-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .view-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-label {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        .view-value {
+            color: var(--text-primary);
+            padding: var(--spacing-sm);
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            min-height: 2rem;
+        }
+
+        .view-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .view-list-item {
+            background-color: var(--bg-secondary);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-sm);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .view-list-item h4 {
+            margin: 0 0 var(--spacing-sm) 0;
+            color: var(--primary-color);
+        }
+
+        .bilingual-value {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 2px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">CIOMS-I Form Management</h1>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">폼 목록</a>
+                <a href="form-edit.html" class="nav-link">새 폼 작성</a>
+                <a href="test.html" class="nav-link">테스트</a>
+            </nav>
+            <div id="theme-toggle-container"></div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1 id="page-title">폼 상세보기</h1>
+                <p class="subtitle">CIOMS-I 부작용 보고서 정보</p>
+            </div>
+
+            <!-- Section 1: Report Information -->
+            <section class="view-section">
+                <h2>1. 보고서 정보</h2>
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">관리번호</span>
+                        <span class="view-value" id="view-control-no">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">접수일</span>
+                        <span class="view-value" id="view-date-received">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">생성일</span>
+                        <span class="view-value" id="view-created-at">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">최종 수정일</span>
+                        <span class="view-value" id="view-updated-at">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Patient Information -->
+            <section class="view-section">
+                <h2>2. 환자 정보</h2>
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">환자 이니셜</span>
+                        <span class="view-value" id="view-patient-initials">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">국가</span>
+                        <span class="view-value" id="view-patient-country">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">나이</span>
+                        <span class="view-value" id="view-patient-age">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">성별</span>
+                        <span class="view-value" id="view-patient-sex">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Adverse Reactions -->
+            <section class="view-section">
+                <h2>3. 부작용 (Adverse Reactions)</h2>
+                <ul class="view-list" id="view-adverse-reactions">
+                    <li class="empty-state">부작용 정보가 없습니다.</li>
+                </ul>
+            </section>
+
+            <!-- Section 4: Suspected Drugs -->
+            <section class="view-section">
+                <h2>4. 의심 약물 (Suspected Drugs)</h2>
+                <ul class="view-list" id="view-suspected-drugs">
+                    <li class="empty-state">약물 정보가 없습니다.</li>
+                </ul>
+            </section>
+
+            <!-- Section 5: Laboratory Results -->
+            <section class="view-section">
+                <h2>5. 검사 결과 (Laboratory Results)</h2>
+                <ul class="view-list" id="view-lab-results">
+                    <li class="empty-state">검사 결과가 없습니다.</li>
+                </ul>
+            </section>
+
+            <!-- Section 6: Causality Assessment -->
+            <section class="view-section">
+                <h2>6. 인과관계 평가 (Causality Assessment)</h2>
+                <div class="view-grid">
+                    <div class="view-item">
+                        <span class="view-label">평가 방법</span>
+                        <span class="view-value" id="view-causality-method">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">평가 결과</span>
+                        <span class="view-value" id="view-causality-category">-</span>
+                    </div>
+                    <div class="view-item" style="grid-column: 1 / -1;">
+                        <span class="view-label">평가 근거</span>
+                        <span class="view-value" id="view-causality-reason">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">평가자</span>
+                        <span class="view-value" id="view-causality-assessed-by">-</span>
+                    </div>
+                    <div class="view-item">
+                        <span class="view-label">평가일</span>
+                        <span class="view-value" id="view-causality-assessed-date">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="actions-bar">
+                <button onclick="window.location.href='index.html'" class="btn btn-secondary">
+                    목록으로
+                </button>
+                <button onclick="editForm()" class="btn btn-primary">
+                    수정
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 CIOMS-I Form Management System</p>
+        </div>
+    </footer>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>데이터를 불러오는 중...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/pages/form-view.js"></script>
+    <script type="module">
+        import { createThemeToggle } from './js/utils/dark-mode.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('theme-toggle-container');
+            if (container) {
+                createThemeToggle(container);
+            }
+        });
+    </script>
+</body>
+</html>

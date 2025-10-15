@@ -371,6 +371,7 @@ body,
 
 [data-theme="dark"] .data-table td {
     border-bottom-color: var(--dm-border-color);
+    color: var(--dm-text-primary);
 }
 
 [data-theme="dark"] .data-table tbody tr:hover {
@@ -561,4 +562,36 @@ body,
 
 [data-theme="dark"] .text-warning {
     color: var(--dm-warning-color);
+}
+
+/* Form View page dark mode */
+[data-theme="dark"] .view-section {
+    background-color: var(--dm-card-bg);
+}
+
+[data-theme="dark"] .view-section h2 {
+    color: var(--dm-primary-color);
+    border-bottom-color: var(--dm-border-color);
+}
+
+[data-theme="dark"] .view-label {
+    color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .view-value {
+    color: var(--dm-text-primary);
+    background-color: var(--dm-bg-tertiary);
+}
+
+[data-theme="dark"] .view-list-item {
+    background-color: var(--dm-bg-tertiary);
+    border-left-color: var(--dm-primary-color);
+}
+
+[data-theme="dark"] .view-list-item h4 {
+    color: var(--dm-primary-color);
+}
+
+[data-theme="dark"] .actions-bar {
+    border-top-color: var(--dm-border-color);
 }
