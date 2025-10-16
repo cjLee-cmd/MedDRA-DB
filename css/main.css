@@ -65,6 +65,19 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Fluid Typography */
+@media (min-width: 320px) {
+    html {
+        font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1200 - 320)));
+    }
+}
+
+@media (min-width: 1200px) {
+    html {
+        font-size: 16px;
+    }
+}
+
 body {
     font-family: var(--font-family);
     font-size: var(--font-size-base);
@@ -106,7 +119,7 @@ a:hover {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
+    padding: 0 clamp(1rem, 5vw, 1.5rem);
 }
 
 .main-content {
@@ -222,13 +235,14 @@ a:hover {
 
 .form-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-md);
 }
 
 .form-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     margin-top: var(--spacing-lg);
 }
@@ -362,6 +376,7 @@ a:hover {
 
 .empty-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     justify-content: center;
     margin-top: var(--spacing-lg);
