@@ -9,6 +9,23 @@ import { logAudit } from './AuditLog.js';
 
 export class Form {
     /**
+     * Check if form with manufacturer control number exists
+     * @param {string} controlNo - Manufacturer control number
+     * @returns {Promise<object|null>} Existing form or null
+     */
+    static async getByControlNo(controlNo) {
+        await db.init();
+
+        try {
+            const forms = await db.getByIndex(STORES.FORMS, 'manufacturer_control_no', controlNo);
+            return forms.length > 0 ? forms[0] : null;
+        } catch (error) {
+            console.error('Error checking control number:', error);
+            return null;
+        }
+    }
+
+    /**
      * Create a new CIOMS-I form with all related data
      * @param {object} formData - Complete form data
      * @returns {Promise<number>} Form ID
@@ -17,6 +34,14 @@ export class Form {
         await db.init();
 
         try {
+            // Check for duplicate manufacturer_control_no
+            if (formData.manufacturer_control_no) {
+                const existing = await this.getByControlNo(formData.manufacturer_control_no);
+                if (existing) {
+                    throw new Error(`폼이 이미 존재합니다: 관리번호 "${formData.manufacturer_control_no}" (ID: ${existing.id})`);
+                }
+            }
+
             // 1. Create main form record
             const form = {
                 manufacturer_control_no: formData.manufacturer_control_no,
