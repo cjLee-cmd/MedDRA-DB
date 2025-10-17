@@ -143,6 +143,8 @@ a:hover {
     justify-content: space-between;
     padding-top: var(--spacing-sm);
     padding-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
 }
 
 .logo {
