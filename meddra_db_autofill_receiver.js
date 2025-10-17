@@ -187,11 +187,10 @@
       countryInput.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
-    // 나이 (예: "62 Years" → "62")
+    // 나이 (예: "62 Years" - 전체 형식 유지)
     const ageInput = document.querySelector('input[placeholder*="나이"], input[name*="age"], input[id*="age"]');
     if (ageInput && patientInfo.Age) {
-      const ageStr = patientInfo.Age.toString().replace(/\s*Years?/i, '').trim();
-      ageInput.value = ageStr;
+      ageInput.value = patientInfo.Age;  // Keep full format like "62 Years"
       ageInput.dispatchEvent(new Event('input', { bubbles: true }));
       ageInput.dispatchEvent(new Event('change', { bubbles: true }));
     }
@@ -217,50 +216,47 @@
     const reactions = ciomsData.반응_정보?.Adverse_Reactions || [];
     if (reactions.length === 0) return;
 
-    // 첫 번째 반응 입력란 찾기
-    const firstReactionEN = document.querySelector('input[placeholder*="NAUSEA"], input[placeholder*="반응명"][placeholder*="영어"]');
-    const firstReactionKO = document.querySelector('input[placeholder*="오심"], input[placeholder*="반응명"][placeholder*="한글"]');
+    console.log(`[AutoFill] 반응 ${reactions.length}개 입력 시작`);
 
-    if (!firstReactionEN || !firstReactionKO) {
-      console.warn('[AutoFill] 반응 입력란을 찾을 수 없습니다');
+    // 부작용 추가 버튼 찾기 (한 번만)
+    const addButtons = Array.from(document.querySelectorAll('button[type="button"]'));
+    const reactionAddBtn = addButtons.find(btn =>
+      btn.textContent.includes('부작용 추가') || btn.textContent.includes('반응 추가')
+    );
+
+    if (!reactionAddBtn) {
+      console.warn('[AutoFill] 부작용 추가 버튼을 찾을 수 없습니다');
       return;
     }
 
-    // 첫 번째 반응 입력
-    if (reactions[0]) {
-      firstReactionEN.value = reactions[0].english || '';
-      firstReactionKO.value = reactions[0].korean || '';
-      firstReactionEN.dispatchEvent(new Event('input', { bubbles: true }));
-      firstReactionKO.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+    // 각 반응을 순차적으로 입력
+    for (let i = 0; i < reactions.length; i++) {
+      const reaction = reactions[i];
+      const reactionIndex = i + 1;  // Form uses 1-based indexing
 
-    // 나머지 반응들 추가
-    for (let i = 1; i < reactions.length; i++) {
-      await sleep(200);
+      console.log(`[AutoFill] 반응 #${reactionIndex} 입력: ${reaction.english} / ${reaction.korean}`);
 
-      // 부작용 추가 버튼 찾기
-      const addButton = document.querySelector('button[type="button"]');
-      const addButtons = Array.from(document.querySelectorAll('button[type="button"]'));
-      const reactionAddBtn = addButtons.find(btn =>
-        btn.textContent.includes('부작용 추가') || btn.textContent.includes('반응 추가')
-      );
-
-      if (reactionAddBtn) {
+      // 첫 번째 반응은 이미 존재하므로 추가하지 않음
+      if (i > 0) {
         reactionAddBtn.click();
-        await sleep(300);
-
-        // 새로 추가된 입력란 찾기
-        const allReactionInputs = document.querySelectorAll('input[placeholder*="반응명"]');
-        const reactionEN = allReactionInputs[i * 2];
-        const reactionKO = allReactionInputs[i * 2 + 1];
-
-        if (reactionEN && reactionKO) {
-          reactionEN.value = reactions[i].english || '';
-          reactionKO.value = reactions[i].korean || '';
-          reactionEN.dispatchEvent(new Event('input', { bubbles: true }));
-          reactionKO.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+        await sleep(500);  // Wait for DOM update
       }
+
+      // name 속성으로 정확한 입력란 찾기
+      const reactionEN = document.querySelector(`input[name="reaction_en_${reactionIndex}"]`);
+      const reactionKO = document.querySelector(`input[name="reaction_ko_${reactionIndex}"]`);
+
+      if (reactionEN && reactionKO) {
+        reactionEN.value = reaction.english || '';
+        reactionKO.value = reaction.korean || '';
+        reactionEN.dispatchEvent(new Event('input', { bubbles: true }));
+        reactionKO.dispatchEvent(new Event('input', { bubbles: true }));
+        console.log(`[AutoFill] 반응 #${reactionIndex} 입력 완료`);
+      } else {
+        console.warn(`[AutoFill] 반응 #${reactionIndex} 입력란을 찾을 수 없습니다`);
+      }
+
+      await sleep(200);
     }
   }
 
@@ -272,93 +268,66 @@
 
     if (allDrugs.length === 0) return;
 
-    // 첫 번째 약물 입력란 찾기
-    const firstDrugEN = document.querySelector('input[placeholder*="Aspirin"], input[placeholder*="약물명"][placeholder*="영어"]');
-    const firstDrugKO = document.querySelector('input[placeholder*="아스피린"], input[placeholder*="약물명"][placeholder*="한글"]');
-    const firstIndicationEN = document.querySelector('input[placeholder*="Pain relief"], input[placeholder*="적응증"][placeholder*="영어"]');
-    const firstIndicationKO = document.querySelector('input[placeholder*="진통"], input[placeholder*="적응증"][placeholder*="한글"]');
+    console.log(`[AutoFill] 약물 ${allDrugs.length}개 입력 시작`);
 
-    if (!firstDrugEN || !firstDrugKO) {
-      console.warn('[AutoFill] 약물 입력란을 찾을 수 없습니다');
+    // 약물 추가 버튼 찾기 (한 번만)
+    const addButtons = Array.from(document.querySelectorAll('button[type="button"]'));
+    const drugAddBtn = addButtons.find(btn =>
+      btn.textContent.includes('약물 추가')
+    );
+
+    if (!drugAddBtn) {
+      console.warn('[AutoFill] 약물 추가 버튼을 찾을 수 없습니다');
       return;
     }
 
-    // 첫 번째 약물 입력
-    if (allDrugs[0]) {
-      const drug = allDrugs[0];
-      firstDrugEN.value = drug.drug_name?.english || '';
-      firstDrugKO.value = drug.drug_name?.korean || '';
-      firstDrugEN.dispatchEvent(new Event('input', { bubbles: true }));
-      firstDrugKO.dispatchEvent(new Event('input', { bubbles: true }));
+    // 각 약물을 순차적으로 입력
+    for (let i = 0; i < allDrugs.length; i++) {
+      const drug = allDrugs[i];
+      const drugIndex = i + 1;  // Form uses 1-based indexing
 
-      if (firstIndicationEN && drug.indication) {
-        firstIndicationEN.value = drug.indication.english || '';
-        firstIndicationEN.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-      if (firstIndicationKO && drug.indication) {
-        firstIndicationKO.value = drug.indication.korean || '';
-        firstIndicationKO.dispatchEvent(new Event('input', { bubbles: true }));
-      }
+      console.log(`[AutoFill] 약물 #${drugIndex} 입력: ${drug.drug_name?.english}`);
 
-      // 의심 약물 vs 병용 약물 선택
-      const firstTypeSelect = document.querySelector('select[name*="type"], select[name*="구분"]');
-      if (firstTypeSelect) {
-        const isSuspected = suspectedDrugs.includes(drug);
-        firstTypeSelect.value = isSuspected ? '의심 약물' : '병용 약물';
-        firstTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    }
-
-    // 나머지 약물들 추가
-    for (let i = 1; i < allDrugs.length; i++) {
-      await sleep(200);
-
-      // 약물 추가 버튼 찾기
-      const addButtons = Array.from(document.querySelectorAll('button[type="button"]'));
-      const drugAddBtn = addButtons.find(btn =>
-        btn.textContent.includes('약물 추가')
-      );
-
-      if (drugAddBtn) {
+      // 첫 번째 약물은 이미 존재하므로 추가하지 않음
+      if (i > 0) {
         drugAddBtn.click();
-        await sleep(300);
-
-        // 새로 추가된 입력란 찾기
-        const allDrugInputs = document.querySelectorAll('input[placeholder*="약물명"]');
-        const drugEN = allDrugInputs[i * 2];
-        const drugKO = allDrugInputs[i * 2 + 1];
-
-        if (drugEN && drugKO) {
-          const drug = allDrugs[i];
-          drugEN.value = drug.drug_name?.english || '';
-          drugKO.value = drug.drug_name?.korean || '';
-          drugEN.dispatchEvent(new Event('input', { bubbles: true }));
-          drugKO.dispatchEvent(new Event('input', { bubbles: true }));
-
-          // 적응증 입력
-          const allIndicationInputs = document.querySelectorAll('input[placeholder*="적응증"]');
-          const indicationEN = allIndicationInputs[i * 2];
-          const indicationKO = allIndicationInputs[i * 2 + 1];
-
-          if (indicationEN && drug.indication) {
-            indicationEN.value = drug.indication.english || '';
-            indicationEN.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-          if (indicationKO && drug.indication) {
-            indicationKO.value = drug.indication.korean || '';
-            indicationKO.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-
-          // 의심 약물 vs 병용 약물 선택
-          const typeSelects = document.querySelectorAll('select[name*="type"], select[name*="구분"]');
-          const typeSelect = typeSelects[i];
-          if (typeSelect) {
-            const isSuspected = suspectedDrugs.includes(drug);
-            typeSelect.value = isSuspected ? '의심 약물' : '병용 약물';
-            typeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-        }
+        await sleep(500);  // Wait for DOM update
       }
+
+      // name 속성으로 정확한 입력란 찾기
+      const drugEN = document.querySelector(`input[name="drug_name_en_${drugIndex}"]`);
+      const drugKO = document.querySelector(`input[name="drug_name_ko_${drugIndex}"]`);
+      const indicationEN = document.querySelector(`input[name="indication_en_${drugIndex}"]`);
+      const indicationKO = document.querySelector(`input[name="indication_ko_${drugIndex}"]`);
+      const typeSelect = document.querySelector(`select[name="is_suspected_${drugIndex}"]`);
+
+      if (drugEN && drugKO) {
+        drugEN.value = drug.drug_name?.english || '';
+        drugKO.value = drug.drug_name?.korean || '';
+        drugEN.dispatchEvent(new Event('input', { bubbles: true }));
+        drugKO.dispatchEvent(new Event('input', { bubbles: true }));
+
+        if (indicationEN && drug.indication) {
+          indicationEN.value = drug.indication.english || '';
+          indicationEN.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (indicationKO && drug.indication) {
+          indicationKO.value = drug.indication.korean || '';
+          indicationKO.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        if (typeSelect) {
+          const isSuspected = suspectedDrugs.includes(drug);
+          typeSelect.value = isSuspected ? 'true' : 'false';
+          typeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        console.log(`[AutoFill] 약물 #${drugIndex} 입력 완료`);
+      } else {
+        console.warn(`[AutoFill] 약물 #${drugIndex} 입력란을 찾을 수 없습니다`);
+      }
+
+      await sleep(200);
     }
   }
 
