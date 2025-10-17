@@ -100,16 +100,12 @@
       await sleep(1000);
       hideProgressOverlay();
 
-      // 완료 알림
-      alert(
-        '✅ 자동 입력 완료!\n\n' +
-        '입력된 데이터:\n' +
-        `- 제조업체 관리번호: ${ciomsData.보고서_정보?.Manufacturer_Control_No || 'N/A'}\n` +
-        `- 환자 정보: ${ciomsData.환자_정보?.Initials || 'N/A'}\n` +
-        `- 유해 반응: ${reactionCount}개\n` +
-        `- 의심 약물: ${drugCount}개\n\n` +
-        '입력된 내용을 확인하신 후 저장 버튼을 눌러주세요.'
-      );
+      // 완료 로그 (알림 없음)
+      console.log('[AutoFill] 자동 입력 완료!');
+      console.log(`- 제조업체 관리번호: ${ciomsData.보고서_정보?.Manufacturer_Control_No || 'N/A'}`);
+      console.log(`- 환자 정보: ${ciomsData.환자_정보?.Initials || 'N/A'}`);
+      console.log(`- 유해 반응: ${reactionCount}개`);
+      console.log(`- 의심 약물: ${drugCount}개`);
 
     } catch (error) {
       console.error('[AutoFill] 자동 입력 오류:', error);
