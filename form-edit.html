@@ -146,6 +146,12 @@
         .form-group.error .error-message {
             display: block;
         }
+
+        /* 1번 섹션만 높이 축소 */
+        #cioms-form > section:first-of-type .form-grid {
+            grid-template-columns: 1fr 1fr;
+            max-width: 66.67%;
+        }
     </style>
 </head>
 <body>
