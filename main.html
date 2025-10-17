@@ -38,6 +38,14 @@
         /* 테이블 컨테이너 전체 폭 사용 */
         #forms-table-container {
             width: 100%;
+            margin-left: calc(-1 * var(--spacing-md));
+            margin-right: calc(-1 * var(--spacing-md));
+            padding-left: var(--spacing-md);
+            padding-right: var(--spacing-md);
+        }
+
+        .table-wrapper {
+            width: 100%;
             overflow-x: auto;
         }
 
@@ -188,24 +196,26 @@
                     </div>
                 </div>
 
-                <!-- Forms Table -->
+                <!-- Forms Table Container with full width -->
                 <div id="forms-table-container" style="display: none;">
-                    <table id="forms-table" class="data-table">
-                        <thead>
-                            <tr>
-                                <th>관리번호</th>
-                                <th>접수일</th>
-                                <th>환자</th>
-                                <th>국가</th>
-                                <th>부작용 수</th>
-                                <th>약물 수</th>
-                                <th>작업</th>
-                            </tr>
-                        </thead>
-                        <tbody id="forms-tbody">
-                            <!-- Dynamically populated -->
-                        </tbody>
-                    </table>
+                    <div class="table-wrapper">
+                        <table id="forms-table" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>관리번호</th>
+                                    <th>접수일</th>
+                                    <th>환자</th>
+                                    <th>국가</th>
+                                    <th>부작용 수</th>
+                                    <th>약물 수</th>
+                                    <th>작업</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forms-tbody">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
 
                     <!-- Pagination -->
                     <div id="pagination" class="pagination">
