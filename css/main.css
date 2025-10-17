@@ -23,20 +23,20 @@
     --bg-secondary: #f8fafc;
     --bg-hover: #f1f5f9;
 
-    /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
+    /* Spacing - Reduced for compact UI */
+    --spacing-xs: 0.2rem;
+    --spacing-sm: 0.375rem;
+    --spacing-md: 0.625rem;
+    --spacing-lg: 0.875rem;
+    --spacing-xl: 1.25rem;
 
-    /* Typography */
+    /* Typography - Reduced for compact UI */
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-lg: 1.125rem;
-    --font-size-xl: 1.25rem;
-    --font-size-2xl: 1.5rem;
+    --font-size-sm: 0.75rem;
+    --font-size-base: 0.875rem;
+    --font-size-lg: 0.95rem;
+    --font-size-xl: 1.05rem;
+    --font-size-2xl: 1.2rem;
 
     /* Borders */
     --border-radius: 0.375rem;
@@ -81,7 +81,7 @@ html {
 body {
     font-family: var(--font-family);
     font-size: var(--font-size-base);
-    line-height: 1.6;
+    line-height: 1.4;
     color: var(--text-primary);
     background-color: var(--bg-secondary);
     min-height: 100vh;
@@ -92,8 +92,8 @@ body {
 /* ===== Typography ===== */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    line-height: 1.2;
-    margin-bottom: var(--spacing-md);
+    line-height: 1.15;
+    margin-bottom: var(--spacing-sm);
 }
 
 h1 { font-size: var(--font-size-2xl); }
@@ -101,7 +101,7 @@ h2 { font-size: var(--font-size-xl); }
 h3 { font-size: var(--font-size-lg); }
 
 p {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
 a {
@@ -124,7 +124,7 @@ a:hover {
 
 .main-content {
     flex: 1;
-    padding: var(--spacing-xl) 0;
+    padding: var(--spacing-md) 0;
 }
 
 /* ===== Header ===== */
@@ -141,8 +141,8 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: var(--spacing-md);
-    padding-bottom: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
 }
 
 .logo {
@@ -154,11 +154,11 @@ a:hover {
 
 .nav {
     display: flex;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-sm);
 }
 
 .nav-link {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--border-radius);
     transition: background-color var(--transition-fast);
     color: var(--text-secondary);
@@ -184,7 +184,7 @@ a:hover {
 .footer {
     background-color: var(--bg-primary);
     border-top: var(--border-width) solid var(--border-color);
-    padding: var(--spacing-lg) 0;
+    padding: var(--spacing-sm) 0;
     margin-top: auto;
 }
 
@@ -202,12 +202,12 @@ a:hover {
 
 /* ===== Forms ===== */
 .form-group {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
 .form-group label {
     display: block;
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: 0.15rem;
     font-weight: 500;
     color: var(--text-primary);
     font-size: var(--font-size-sm);
@@ -215,7 +215,7 @@ a:hover {
 
 .form-control {
     width: 100%;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-sm);
     border: var(--border-width) solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: var(--font-size-base);
@@ -236,15 +236,15 @@ a:hover {
 .form-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
 }
 
 .form-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-lg);
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-md);
 }
 
 /* ===== Buttons ===== */
@@ -252,7 +252,7 @@ a:hover {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-sm) var(--spacing-lg);
+    padding: var(--spacing-xs) var(--spacing-md);
     border: none;
     border-radius: var(--border-radius);
     font-size: var(--font-size-base);
